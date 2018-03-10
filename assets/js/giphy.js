@@ -4,9 +4,9 @@ var gifs = [""];
 // displayMovieInfo function re-renders the HTML to display the appropriate content
 function displayMovieInfo() {
 
-  var animal = $(this).attr("data-animal");
+  var anime = $(this).attr("data-anime");
 var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
-  animal + "&api_key=dc6zaTOxFJmzC&limit=10&ratin=pg";
+  anime + "&api_key=dc6zaTOxFJmzC&limit=10&rating=pg";
   // var movie = $(this).attr("data-name");
   // var queryURL = "https://api.giphy.com/v1/gifs/random?api_key=Ki0QGdOKlAo4nnTTSIuyDb5R1c0zwrts&limit=10&rating=pg"
   // var queryURL = "https://www.omdbapi.com/?t=" + movie + "&y=&plot=short&apikey=trilogy";
@@ -17,8 +17,8 @@ var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
     method: "GET"
   }).then(function(response) {
 
-    // Creating a div to hold the movie
-    var movieDiv = $("<div class='movie'>");
+    // Creating a div to hold the gif
+    var gifDiv = $("<div class='movie'>");
 
     // Storing the rating data
     var rating = response.data;
@@ -27,7 +27,7 @@ var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
     var pOne = $("<p>").text("Rating: " + rating);
 
     // Displaying the rating
-    movieDiv.append(pOne);
+    gifDiv.append(pOne);
 
  var results = response.data;
 
@@ -35,38 +35,42 @@ var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
 for (var i = 0; i < results.length; i++) {
 
 // Creating and storing a div tag
-var animalDiv = $("<div style='height:400px; display:inline-block'>");
+var animeDiv = $("<div style='height:400px; display:inline-block'>");
 
 
 // Creating a paragraph tag with the result item's rating
 var p = $("<p>").text("Rating: " + results[i].rating);
 
 // Creating and storing an image tag
-var animalImage = $("<img>");
+var animeImage = $("<img>");
 // Setting the src attribute of the image to a property pulled off the result item
-var moving = animalImage.attr("src", results[i].images.fixed_height.url);
+animeImage.attr("src", results[i].images.fixed_height.url);
+var moving = animeImage.attr("data-animate", results[i].images.fixed_height.url);
+var still = animeImage.attr("data-still", results[i].images.fixed_height_still.url);
+var dataState = animeImage.attr("data-state", "animate");
+var gifClass = animeImage.addClass("gif");
 
-animalImage.on("click", function(){
-
-var animate = animalDiv.addClass("animate");
-
-for (var i = 0; i < results.length; i++) {
-
-if(animate){
-
-  animalImage.attr("src", results[i].images.fixed_height_still.url);
-
-}
-
-}
+gifClass.on("click", function() {
+  // The attr jQuery method allows us to get or set the value of any attribute on our HTML element
+  var state = $(this).attr("data-state");
+  // If the clicked image's state is still, update its src attribute to what its data-animate value is.
+  // Then, set the image's data-state to animate
+  // Else set src to the data-still value
+  if (state === "animate") {
+    $(this).attr("src", $(this).attr("data-still"));
+    $(this).attr("data-state", "still");
+  } else {
+    $(this).attr("src", $(this).attr("data-animate"));
+    $(this).attr("data-state", "animate");
+  }
 });
 
-// Appending the paragraph and image tag to the animalDiv
-animalDiv.append(p);
-animalDiv.append(animalImage);
+// Appending the paragraph and image tag to the animeDiv
+animeDiv.append(p);
+animeDiv.append(animeImage);
 
-// Prependng the animalDiv to the HTML page in the "#gifs-appear-here" div
-$("#movies-view").prepend(animalDiv);
+// Prependng the animeDiv to the HTML page in the "#gifs-appear-here" div
+$("#movies-view").prepend(animeDiv);
 
 }
 
@@ -96,7 +100,7 @@ function renderButtons() {
     // Adding a class of movie-btn to our button
     a.addClass("movie-btn");
     // Adding a data-attribute
-    a.attr("data-animal", gifs[i]);
+    a.attr("data-anime", gifs[i]);
     // Providing the initial button text
     a.text(gifs[i]);
     // Adding the button to the buttons-view div
